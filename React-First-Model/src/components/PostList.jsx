@@ -1,62 +1,68 @@
 import { useState, useEffect } from 'react';
-import NewPosts from "./NewPosts";
 import Post from "./Post";
-import Modal from "./Modal";
 import styles from "./PostList.module.css";
 
-function PostList({isPosting , onStopPosting}) { 
+function PostList() {
     const [posts, setPosts] = useState([]);
+    const [isFetching, setIsFetching] = useState(false);
 
+    // Executes a function only on page load
     useEffect(() => {
-        async function fetchPosts(){
+        // Get posts from DataBase
+        async function fetchPosts() {
+            setIsFetching(true);
             const response = await fetch('http://localhost:8080/posts')
             const responseData = await response.json();
             setPosts(responseData.posts);
+            setIsFetching(false);
         }
         fetchPosts()
     }, []);
 
-    function addPostsHandler(postData){
+    // Sends to DataBase posts
+    function addPostsHandler(postData) {
         fetch('http://localhost:8080/posts', {
             method: 'POST',
             body: JSON.stringify(postData),
             headers: {
-                'Content-Type' : 'application/json'
+                'Content-Type': 'application/json'
             }
         });
         setPosts((existingPosts) => ([postData, ...existingPosts]));
     }
 
-    function modalContent(visibility) {
-        let modalHandler;
-        if (visibility) {
-            modalHandler = (
-                <Modal onVisible={onStopPosting}>
-                    <NewPosts
-                    onCancel={onStopPosting}
-                    onAddPost={addPostsHandler}
-                    />
-                </Modal>)
-        }
-        return modalHandler
-    }
-
     return (
         <>
-            {modalContent(isPosting)}
-            {posts.length > 0 && (
-            <ul className={styles.posts}>
-                {
-                    posts.map((post) => (<Post key={post.id} author={post.author} body={post.body}/>))
-                }
-            </ul>
-            )}
-            {posts.length === 0 && (<div style={{textAlign: 'center', color: 'white'}}>
+            {/* if the database posts information response is loaded and the size of the array is
+            greater than 0, render posts cards*/}
+            {
+            !isFetching && posts.length > 0 && (
+                <ul className={styles.posts}>
+                    {
+                        posts.map((post) => (<Post key={post.id} author={post.author} body={post.body} />))
+                    }
+                </ul>
+            )
+            }
+
+            {/* If the database posts information is loaded and the posts array is empty.
+            Render the "No posts yet.." text */}
+            
+            {
+            !isFetching && posts.length === 0 && (<div style={{ textAlign: 'center', color: 'white' }}>
                 <h2>No posts yet..</h2>
                 <p>Start adding some!</p>
             </div>
+            )
+            }
+
+            {/* If the database posts information is delayed, render the "loading" text */}
+            
+            {isFetching && (
+                <div style={{ textAlign: 'center', color: 'white' }}>
+                    <p>Loading...</p>
+                </div>
             )}
-             
         </>
     );
 }
