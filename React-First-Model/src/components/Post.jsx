@@ -1,11 +1,14 @@
+import { Link } from 'react-router-dom';
 import styles from './Post.module.css';
 
-function Post(props) {
+function Post({ id, author, body }) {
     // Cards component properties. Uses an author and a description 
     return (
         <li className={styles.post}>
-            <p className={styles.author}>{props.author}</p>
-            <p className={styles.text}>{props.body}</p>
+            <Link to={id}>
+                <p className={styles.author}>{author}</p>
+                <p className={styles.text}>{body}</p>
+            </Link>
         </li>
     );
 }
