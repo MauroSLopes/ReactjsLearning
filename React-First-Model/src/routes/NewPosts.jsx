@@ -1,51 +1,41 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom'; 
+
+import { Link, Form, redirect} from 'react-router-dom'; 
 import styles from './NewPosts.module.css';
 import Modal from '../components/Modal';
 
-function NewPosts({ onAddPost }){   
-    const [currentBody, setCurrentBody] = useState('');
-    const [currentAuthor, setCurrentAuthor] = useState('');
-
-    // Store a description for a new post card
-    function currentBodyHandler(event) {
-        setCurrentBody(event.target.value);
-    }
-
-    // Store a author for a new post card
-    function currentAuthorHandler(event) {
-        setCurrentAuthor(event.target.value);
-    }
-
-    // Sending the storaged informations to the database via the "./PostList.jsx" file
-    function submitHandler(event) {
-        event.preventDefault();
-        const postData = {
-            body: currentBody,
-            author: currentAuthor
-        };
-        onAddPost(postData);
-        onCancel();
-    }
-    
+function NewPosts(){
     return(
         <Modal>
-        <form className={styles.form} onSubmit={submitHandler}>
+        <Form method='post' className={styles.form}>
             <p>
                 <label htmlFor="body">Text</label>
-                <textarea id="body" required rows={3} onChange={currentBodyHandler}/>
+                <textarea id="body" name="body" required rows={3} />
             </p>
             <p>
                 <label htmlFor="name">Your Name</label>
-                <input type="text" id="name" required onChange={currentAuthorHandler}  />
+                <input type="text" id="name" name="author" required />
             </p>
             <p className={styles.actions}>
                 <Link to='..' type="button">Cancel</Link>
                 <button>Submit</button>
             </p>
-        </form>
+        </Form>
         </Modal>
     );
 }
 
 export default NewPosts;
+
+export async function action({request}){
+    const formData = await request.formData();
+    const postData = Object.fromEntries(formData); // { body: '...', author: '...'}
+    await fetch('http://localhost:8080/posts', {
+            method: 'POST',
+            body: JSON.stringify(postData),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        return redirect('/');
+}

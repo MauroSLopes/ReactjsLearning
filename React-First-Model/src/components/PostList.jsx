@@ -5,18 +5,6 @@ import styles from "./PostList.module.css";
 function PostList() {
     const posts = useLoaderData();
 
-    // Sends to DataBase posts
-    function addPostsHandler(postData) {
-        fetch('http://localhost:8080/posts', {
-            method: 'POST',
-            body: JSON.stringify(postData),
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-        setPosts((existingPosts) => ([postData, ...existingPosts]));
-    }
-
     return (
         <>
             {/* if the database posts information response is loaded and the size of the array is
