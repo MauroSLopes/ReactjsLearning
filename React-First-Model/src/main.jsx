@@ -9,12 +9,11 @@ import NewPosts from './routes/NewPosts'
 const router = createBrowserRouter([
   {
     path: '/', element: <RootLayout />, 
-    children: [
-      { path: '/', element: <App />, children: [
-      { path: '/create-post', element: <NewPosts /> },]},
-    ]
-  },
-]);
+    children: [{ 
+      path: '/', element: <App />, 
+      children: [{ 
+        path: '/create-post', element: <NewPosts /> 
+      },]},]},]);
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
