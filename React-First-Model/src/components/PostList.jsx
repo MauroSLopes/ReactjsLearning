@@ -1,23 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useLoaderData } from "react-router-dom";
 import Post from "./Post";
 import styles from "./PostList.module.css";
 
 function PostList() {
-    const [posts, setPosts] = useState([]);
-    const [isFetching, setIsFetching] = useState(false);
-
-    // Executes a function only on page load
-    useEffect(() => {
-        // Get posts from DataBase
-        async function fetchPosts() {
-            setIsFetching(true);
-            const response = await fetch('http://localhost:8080/posts')
-            const responseData = await response.json();
-            setPosts(responseData.posts);
-            setIsFetching(false);
-        }
-        fetchPosts()
-    }, []);
+    const posts = useLoaderData();
 
     // Sends to DataBase posts
     function addPostsHandler(postData) {
@@ -36,7 +22,7 @@ function PostList() {
             {/* if the database posts information response is loaded and the size of the array is
             greater than 0, render posts cards*/}
             {
-            !isFetching && posts.length > 0 && (
+            posts.length > 0 && (
                 <ul className={styles.posts}>
                     {
                         posts.map((post) => (<Post key={post.id} author={post.author} body={post.body} />))
@@ -49,20 +35,12 @@ function PostList() {
             Render the "No posts yet.." text */}
             
             {
-            !isFetching && posts.length === 0 && (<div style={{ textAlign: 'center', color: 'white' }}>
+            posts.length === 0 && (<div style={{ textAlign: 'center', color: 'white' }}>
                 <h2>No posts yet..</h2>
                 <p>Start adding some!</p>
             </div>
             )
             }
-
-            {/* If the database posts information is delayed, render the "loading" text */}
-            
-            {isFetching && (
-                <div style={{ textAlign: 'center', color: 'white' }}>
-                    <p>Loading...</p>
-                </div>
-            )}
         </>
     );
 }
